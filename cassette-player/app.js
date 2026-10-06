@@ -70,15 +70,39 @@
 
   /* ---------- Estado visual ---------- */
 
-  const STATUS_TEXT = {
-    empty: 'NO TAPE', loading: 'LOADING', stop: 'STOP', play: '▶ PLAY',
-    pause: 'PAUSE', ff: '▶▶ FF', rew: '◀◀ REW',
-  };
+  /* ---------- Idioma ---------- */
+
+  const LANG_KEY = 'tapedeck-lang';
+  let lang = (() => {
+    try {
+      const saved = localStorage.getItem(LANG_KEY);
+      if (saved && I18N[saved]) return saved;
+    } catch { /* almacenamiento no disponible */ }
+    return (navigator.language || '').toLowerCase().startsWith('es') ? 'es' : 'en';
+  })();
+
+  // Texto traducido; si falta en un idioma, cae al castellano
+  const tr = (key) => I18N[lang][key] ?? I18N.es[key] ?? key;
+  const statusText = (key) => tr('status')[key] || key.toUpperCase();
+
+  function applyLanguage(next) {
+    if (next && I18N[next]) lang = next;
+    document.documentElement.lang = lang;
+    document.querySelectorAll('[data-i18n]').forEach((el) => { el.textContent = tr(el.dataset.i18n); });
+    document.querySelectorAll('[data-i18n-aria]').forEach((el) => el.setAttribute('aria-label', tr(el.dataset.i18nAria)));
+    document.querySelectorAll('[data-i18n-title]').forEach((el) => { el.title = tr(el.dataset.i18nTitle); });
+    document.querySelectorAll('.lang-btn').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.lang === lang)));
+    try { localStorage.setItem(LANG_KEY, lang); } catch { /* almacenamiento no disponible */ }
+
+    // Textos que pone el JS: display y etiqueta del casete
+    if (state.mode !== 'loading') lcdStatus.textContent = statusText(state.mode);
+    setLabel(currentTrack(), state.index);
+  }
 
   function setMode(mode) {
     state.mode = mode;
     deck.dataset.mode = mode;
-    lcdStatus.textContent = STATUS_TEXT[mode] || mode.toUpperCase();
+    lcdStatus.textContent = statusText(mode);
     btn.play.classList.toggle('latched', mode === 'play');
     btn.pause.classList.toggle('latched', mode === 'pause');
     document.body.classList.toggle('has-caption', state.tapeIn && mode !== 'loading');
@@ -88,18 +112,18 @@
     }
   }
 
-  function flashStatus(text) {
-    lcdStatus.textContent = text;
-    setTimeout(() => { lcdStatus.textContent = STATUS_TEXT[state.mode]; }, 1400);
+  function flashStatus(key) {
+    lcdStatus.textContent = statusText(key);
+    setTimeout(() => { lcdStatus.textContent = statusText(state.mode); }, 1400);
   }
 
   function setLabel(track, i) {
-    const name = track ? track.name : 'Sin cinta';
+    const name = track ? track.name : tr('noTape');
     labelTitle.textContent = truncate(name, 24);
     deck.style.setProperty('--stripe', STRIPES[Math.max(i, 0) % STRIPES.length]);
     stageCaption.textContent = track ? name : '';
 
-    lcdTitle.textContent = track ? name : 'Añade canciones para empezar';
+    lcdTitle.textContent = track ? name : tr('lcdEmpty');
     lcdTrack.textContent = track
       ? `${String(i + 1).padStart(2, '0')}/${String(state.tracks.length).padStart(2, '0')}`
       : '--/--';
@@ -163,7 +187,7 @@
   function addFiles(fileList) {
     const files = [...fileList].filter((f) => f.type.startsWith('audio/') || AUDIO_EXT.test(f.name));
     if (!files.length) {
-      flashStatus('NO AUDIO');
+      flashStatus('noAudio');
       return;
     }
     for (const f of files) {
@@ -196,7 +220,7 @@
     state.tapeIn = false;
     seek.disabled = true;
     setMode('loading');
-    lcdStatus.textContent = 'EJECT';
+    lcdStatus.textContent = statusText('eject');
     deck.classList.remove('door-closed');
     await wait(DOOR_MS);
     deck.classList.remove('tape-in');
@@ -243,7 +267,7 @@
     } catch (err) {
       console.error(err);
       setMode('stop');
-      flashStatus('ERROR');
+      flashStatus('error');
     }
   }
 
@@ -264,7 +288,7 @@
     ensureAudioGraph();
     enqueue(async () => {
       if (!state.tracks.length) {
-        flashStatus('NO TAPE');
+        flashStatus('empty');
         addBtn.classList.remove('pulse');
         void addBtn.offsetWidth;
         addBtn.classList.add('pulse');
@@ -598,9 +622,13 @@
 
   /* ---------- Inicio ---------- */
 
+  document.querySelectorAll('.lang-btn').forEach((b) => {
+    b.addEventListener('click', () => applyLanguage(b.dataset.lang));
+  });
+
   audio.volume = Number(volume.value);
   setRangeFill(volume);
-  setLabel(null, -1);
+  applyLanguage();
   setMode('empty');
   requestAnimationFrame(frame);
 })();

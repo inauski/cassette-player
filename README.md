@@ -18,6 +18,7 @@ Reproductor de música web con forma de pletina de casete. Al pulsar play, el ca
 - Mantén pulsado avance rápido o rebobinar para mover la canción. Los carretes giran más rápido mientras tanto.
 - Tiene una pantalla con el estado, la pista y el tiempo, y un vúmetro estéreo que se mueve con la música.
 - La lista de canciones aparece como la carátula de papel de la cinta, escrita a mano.
+- La interfaz está en castellano e inglés. Elige el idioma con el botón de arriba a la derecha y se recordará la próxima vez.
 
 Las canciones no se suben a ningún sitio: se reproducen solo en tu navegador y se pierden al recargar la página.
 
@@ -44,7 +45,8 @@ git clone https://github.com/inauski/cassette-player.git
 
 - `cassette-player/index.html`: la pletina, el casete (SVG), los controles y la lista.
 - `cassette-player/styles.css`: el diseño y todas las animaciones.
-- `cassette-player/app.js`: la reproducción, la cola de animaciones y el vúmetro (Web Audio API).
+- `cassette-player/app.js`: la reproducción, la cola de animaciones, el vúmetro (Web Audio API) y el cambio de idioma.
+- `cassette-player/i18n.js`: los textos de la interfaz en castellano e inglés.
 - `index.html`: redirige la raíz de GitHub Pages al reproductor.
 
 Está hecho con HTML, CSS y JavaScript, sin frameworks.
@@ -65,6 +67,7 @@ A web music player shaped like a cassette deck. When you press play, the tape sl
 - Hold fast-forward or rewind to move through the song. The reels spin faster while you do.
 - A display shows the status, track and time, and a stereo VU meter moves with the music.
 - The playlist looks like the tape's handwritten paper insert.
+- The interface is available in Spanish and English. Pick the language with the button at the top right; your choice is remembered.
 
 Songs aren't uploaded anywhere: they play only in your browser and are gone when you reload the page.
 
@@ -91,7 +94,8 @@ git clone https://github.com/inauski/cassette-player.git
 
 - `cassette-player/index.html`: the deck, the cassette (SVG), the controls and the playlist.
 - `cassette-player/styles.css`: the design and all the animations.
-- `cassette-player/app.js`: playback, the animation queue and the VU meter (Web Audio API).
+- `cassette-player/app.js`: playback, the animation queue, the VU meter (Web Audio API) and language switching.
+- `cassette-player/i18n.js`: the interface text in Spanish and English.
 - `index.html`: redirects the GitHub Pages root to the player.
 
 Built with plain HTML, CSS and JavaScript, no frameworks.

@@ -29,4 +29,6 @@ Open `cassette-player/index.html` directly in a browser (on Windows: `Start-Proc
 
 The playlist is styled as the tape's paper J-card (`.jcard`), beside the deck on wide screens. It uses `contain: size` so a long track list doesn't stretch the grid rows; the `<ol>` scrolls instead. Below 1100px the layout is a single column and `contain` is removed.
 
+**UI text is bilingual (Spanish/English).** All strings live in `cassette-player/i18n.js` (`window.I18N.es` / `.en`, loaded before `app.js`). Static HTML text is tagged with `data-i18n` (textContent), `data-i18n-aria` (aria-label) and `data-i18n-title` (title); `applyLanguage()` in `app.js` swaps them and re-renders JS-set text (LCD status via `statusText()`, the empty cassette label and LCD hint via `tr()`). New user-visible text must be added to both languages in `i18n.js`, never hardcoded. The choice persists in `localStorage` (`tapedeck-lang`); the default comes from the browser language.
+
 Slider fills use a `--p` CSS variable set by `setRangeFill()`. The cassette label stripe color comes from `--stripe` on `#deck`, taken from the `STRIPES` palette indexed by track number.
